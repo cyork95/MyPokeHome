@@ -497,38 +497,48 @@ h1, h2, h3, h4, h5 {
 
 /* Wallpaper styles */
 .wallpaper-forest {
-  background: linear-gradient(180deg, #1d432a 0%, #112519 100%);
+  background-color: #112519;
   background-image: radial-gradient(rgba(30, 200, 100, 0.1) 15%, transparent 20%),
-                    radial-gradient(rgba(30, 200, 100, 0.05) 15%, transparent 20%);
-  background-size: 40px 40px;
-  background-position: 0 0, 20px 20px;
+                    radial-gradient(rgba(30, 200, 100, 0.05) 15%, transparent 20%),
+                    linear-gradient(180deg, #1d432a 0%, #112519 100%);
+  background-size: 40px 40px, 40px 40px, 100% 100%;
+  background-position: 0 0, 20px 20px, 0 0;
 }
 .wallpaper-city {
-  background: linear-gradient(180deg, #1c2536 0%, #0d121c 100%);
+  background-color: #0d121c;
   background-image: linear-gradient(rgba(0, 150, 255, 0.08) 1px, transparent 1px),
-                    linear-gradient(90deg, rgba(0, 150, 255, 0.08) 1px, transparent 1px);
-  background-size: 30px 30px;
+                    linear-gradient(90deg, rgba(0, 150, 255, 0.08) 1px, transparent 1px),
+                    linear-gradient(180deg, #1c2536 0%, #0d121c 100%);
+  background-size: 30px 30px, 30px 30px, 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
 }
 .wallpaper-volcano {
-  background: linear-gradient(180deg, #431d1d 0%, #210d0d 100%);
-  background-image: radial-gradient(rgba(240, 50, 50, 0.12) 30%, transparent 40%);
-  background-size: 50px 50px;
+  background-color: #210d0d;
+  background-image: radial-gradient(rgba(240, 50, 50, 0.12) 30%, transparent 40%),
+                    linear-gradient(180deg, #431d1d 0%, #210d0d 100%);
+  background-size: 50px 50px, 100% 100%;
+  background-position: 0 0, 0 0;
 }
 .wallpaper-deepsea {
-  background: linear-gradient(180deg, #0f2b48 0%, #061224 100%);
-  background-image: radial-gradient(rgba(0, 200, 255, 0.1) 8%, transparent 8%);
-  background-size: 25px 25px;
+  background-color: #061224;
+  background-image: radial-gradient(rgba(0, 200, 255, 0.1) 8%, transparent 8%),
+                    linear-gradient(180deg, #0f2b48 0%, #061224 100%);
+  background-size: 25px 25px, 100% 100%;
+  background-position: 0 0, 0 0;
 }
 .wallpaper-classic {
-  background: #2a52be;
-  background-image: linear-gradient(transparent 50%, rgba(0,0,0,0.15) 50%);
-  background-size: 100% 6px;
+  background-color: #2a52be;
+  background-image: linear-gradient(transparent 50%, rgba(0,0,0,0.15) 50%),
+                    linear-gradient(180deg, #2a52be 0%, #183180 100%);
+  background-size: 100% 6px, 100% 100%;
 }
 .wallpaper-retro-amber {
-  background: #1c1404;
+  background-color: #1c1404;
   background-image: linear-gradient(rgba(255, 179, 0, 0.08) 2px, transparent 2px),
-                    linear-gradient(90deg, rgba(255, 179, 0, 0.08) 2px, transparent 2px);
-  background-size: 40px 40px;
+                    linear-gradient(90deg, rgba(255, 179, 0, 0.08) 2px, transparent 2px),
+                    linear-gradient(180deg, #2c1f08 0%, #120b02 100%);
+  background-size: 40px 40px, 40px 40px, 100% 100%;
+  background-position: 0 0, 0 0, 0 0;
 }
 
 /* PC Slot Design */

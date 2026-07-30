@@ -356,6 +356,7 @@ const App = {
   },
   speciesCache: [],
   selectedPokemon: null,
+  activeSlot: null,
   currentTab: 'box-view',
   gameFilter: 'all',
   editingId: null,
@@ -383,6 +384,10 @@ const App = {
     this.renderStats();
     this.renderPartyShowcase();
     this.renderPCBox();
+    
+    // Set initial select values
+    document.getElementById('wallpaper-select').value = this.settings.wallpaper;
+
     this.setupEventListeners();
     this.checkBackupInterval();
   },
@@ -901,6 +906,7 @@ const App = {
 
   openAddModal(boxId, slotId) {
     this.editingId = null;
+    this.activeSlot = slotId || null;
     document.getElementById('modal-title').textContent = 'Deposit Pokemon';
     document.getElementById('pokemon-form').reset();
     
@@ -1117,11 +1123,11 @@ const App = {
       });
 
       // Find first empty slot in target box if slot not defined or if we're adding
-      let slot = 1;
+      let slot = this.activeSlot || 1;
       if (this.editingId) {
         const currentPoke = this.pokemonList.find(p => p.id === this.editingId);
         slot = currentPoke ? currentPoke.slot : 1;
-      } else {
+      } else if (!this.activeSlot) {
         const boxOccupiedSlots = this.pokemonList
           .filter(p => p.box === box && p.game === (this.gameFilter === 'all' ? p.game : this.gameFilter))
           .map(p => p.slot);
