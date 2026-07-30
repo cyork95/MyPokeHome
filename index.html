@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyPokeHome - Retro Collection Mimic</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2c2f33">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+  <!-- App Container -->
+  <div class="app-container">
+    
+    <!-- Top Navigation Header -->
+    <header class="main-header">
+      <div class="logo-area">
+        <i class="fa-solid fa-house-chimney-window logo-icon"></i>
+        <h1>MyPokeHome</h1>
+        <span class="version-tag">Retro Collector</span>
+      </div>
+      
+      <!-- Global Controls -->
+      <div class="global-controls">
+        <div class="select-game-wrapper">
+          <label for="game-filter"><i class="fa-solid fa-gamepad"></i></label>
+          <select id="game-filter">
+            <option value="all">All Retro Games</option>
+            <optgroup label="Gen 1 (GB)">
+              <option value="red">Pokémon Red</option>
+              <option value="blue">Pokémon Blue</option>
+              <option value="yellow">Pokémon Yellow</option>
+            </optgroup>
+            <optgroup label="Gen 2 (GBC)">
+              <option value="gold">Pokémon Gold</option>
+              <option value="silver">Pokémon Silver</option>
+              <option value="crystal">Pokémon Crystal</option>
+            </optgroup>
+            <optgroup label="Gen 3 (GBA)">
+              <option value="ruby">Pokémon Ruby</option>
+              <option value="sapphire">Pokémon Sapphire</option>
+              <option value="emerald">Pokémon Emerald</option>
+              <option value="firered">Pokémon FireRed</option>
+              <option value="leafgreen">Pokémon LeafGreen</option>
+            </optgroup>
+            <optgroup label="Gen 4 (DS)">
+              <option value="diamond">Pokémon Diamond</option>
+              <option value="pearl">Pokémon Pearl</option>
+              <option value="platinum">Pokémon Platinum</option>
+              <option value="heartgold">Pokémon HeartGold</option>
+              <option value="soulsilver">Pokémon SoulSilver</option>
+            </optgroup>
+            <optgroup label="Gen 5 (DS)">
+              <option value="black">Pokémon Black</option>
+              <option value="white">Pokémon White</option>
+              <option value="black2">Pokémon Black 2</option>
+              <option value="white2">Pokémon White 2</option>
+            </optgroup>
+            <optgroup label="Gen 6 (3DS)">
+              <option value="x">Pokémon X</option>
+              <option value="y">Pokémon Y</option>
+              <option value="omega_ruby">Pokémon Omega Ruby</option>
+              <option value="alpha_sapphire">Pokémon Alpha Sapphire</option>
+            </optgroup>
+            <optgroup label="Gen 7 (3DS)">
+              <option value="sun">Pokémon Sun</option>
+              <option value="moon">Pokémon Moon</option>
+              <option value="ultra_sun">Pokémon Ultra Sun</option>
+              <option value="ultra_moon">Pokémon Ultra Moon</option>
+            </optgroup>
+          </select>
+        </div>
+        
+        <button id="btn-export" class="header-btn" title="Export Library JSON"><i class="fa-solid fa-file-export"></i> Export</button>
+        <button id="btn-import-trigger" class="header-btn" title="Import Library JSON"><i class="fa-solid fa-file-import"></i> Import</button>
+        <input type="file" id="file-import" accept=".json" style="display: none;">
+        
+        <button id="btn-add-pokemon" class="add-pokemon-btn"><i class="fa-solid fa-plus"></i> Add Pokemon</button>
+      </div>
+    </header>
+    
+    <!-- Party Showcase (Top 6 Pinned) -->
+    <section class="party-showcase-section">
+      <h3 class="section-title"><i class="fa-solid fa-star text-gold"></i> Pinned Party Favorites (Click slots to assign)</h3>
+      <div class="party-grid" id="party-grid">
+        <!-- 6 Slots will be generated here -->
+      </div>
+    </section>
+
+    <!-- Main Content Area Grid -->
+    <main class="main-content-layout">
+      
+      <!-- Left side: Dashboard, Tabs, Filters & Boxes Grid -->
+      <div class="left-content-panel">
+        
+        <!-- Dashboard Widgets -->
+        <section class="dashboard-widgets">
+          <div class="widget-card stats-total">
+            <div class="widget-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+            <div class="widget-data">
+              <h4 id="stat-total-count">0</h4>
+              <p>Total Tracked</p>
+            </div>
+          </div>
+          <div class="widget-card stats-shiny">
+            <div class="widget-icon text-shiny"><i class="fa-solid fa-sparkles"></i></div>
+            <div class="widget-data">
+              <h4 id="stat-shiny-count">0</h4>
+              <p>Shiny Pokemon</p>
+            </div>
+          </div>
+          <div class="widget-card stats-dex">
+            <div class="widget-icon text-dex"><i class="fa-solid fa-book-pokemon"></i></div>
+            <div class="widget-data">
+              <h4 id="stat-dex-percent">0%</h4>
+              <p>Dex Progress</p>
+            </div>
+          </div>
+          <div class="widget-card stats-badges">
+            <div class="widget-icon text-badges"><i class="fa-solid fa-award"></i></div>
+            <div class="widget-data">
+              <h4 id="stat-badges-count">0/0</h4>
+              <p>Badges Unlocked</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tab & Wallpaper Customizer controls -->
+        <div class="view-and-customizer">
+          <!-- View Switcher Tabs -->
+          <div class="view-tabs">
+            <button class="tab-btn active" data-tab="box-view"><i class="fa-solid fa-grip"></i> Box View</button>
+            <button class="tab-btn" data-tab="living-dex"><i class="fa-solid fa-list-check"></i> Living Dex</button>
+            <button class="tab-btn" data-tab="achievements-view"><i class="fa-solid fa-trophy"></i> Achievements</button>
+          </div>
+          
+          <!-- Box customizer (only visible in Box View) -->
+          <div id="box-customizer-controls" class="box-customizer">
+            <div class="box-nav">
+              <button id="btn-prev-box" class="nav-arrow-btn"><i class="fa-solid fa-chevron-left"></i></button>
+              <span id="box-title-label">Box 1</span>
+              <button id="btn-next-box" class="nav-arrow-btn"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            
+            <div class="wallpaper-selector-wrapper">
+              <label for="wallpaper-select">Wallpaper:</label>
+              <select id="wallpaper-select">
+                <option value="forest">Forest Green</option>
+                <option value="city">Metro City</option>
+                <option value="volcano">Magma Volcano</option>
+                <option value="deepsea">Deep Sea</option>
+                <option value="classic">Classic PC Blue</option>
+                <option value="retro-amber">Retro Amber</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Display Views -->
+        <div class="display-panels">
+          
+          <!-- Box View Panel -->
+          <div id="panel-box-view" class="tab-panel active">
+            <!-- Box Container with Grid -->
+            <div class="pc-box-container wallpaper-forest" id="pc-box-grid">
+              <!-- 30 slots generated by javascript -->
+            </div>
+          </div>
+          
+          <!-- Living Dex Panel -->
+          <div id="panel-living-dex" class="tab-panel">
+            <div class="living-dex-controls">
+              <div class="dex-search-wrapper">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="dex-search-input" placeholder="Search Dex by name or number...">
+              </div>
+              <div class="dex-filters">
+                <label><input type="checkbox" id="dex-filter-caught"> Hide Deposited</label>
+              </div>
+            </div>
+            <div class="national-dex-grid" id="national-dex-grid">
+              <!-- Slots 1 - 1025 populated by JS -->
+            </div>
+          </div>
+          
+          <!-- Achievements Panel -->
+          <div id="panel-achievements-view" class="tab-panel">
+            <div class="achievements-container">
+              <div class="achievements-header-card">
+                <div class="badge-status-glow">
+                  <i class="fa-solid fa-circle-check text-success"></i>
+                  <span id="game-badge-header-title">No Game Selected</span>
+                </div>
+                <p>Complete retro game achievements to unlock unique collectible medals for your summary dashboard!</p>
+              </div>
+              <div class="achievements-list-grid" id="achievements-list-grid">
+                <!-- Checkboxes populated based on filtered game -->
+              </div>
+            </div>
+          </div>
+          
+        </div>
+      </div>
+      
+      <!-- Right side: Retro Summary Screen & Pinned Showcase Details -->
+      <div class="right-content-panel">
+        <div class="retro-summary-card-wrapper">
+          
+          <!-- Card Header Info -->
+          <div class="summary-card-header">
+            <h3><i class="fa-solid fa-circle-info"></i> Pokemon Summary</h3>
+            <span class="active-badge-tag" id="current-card-game-badge">No Origin</span>
+          </div>
+          
+          <!-- The Retro Gameboy/GBA Style Summary Screen -->
+          <div class="gba-summary-screen" id="gba-summary-screen">
+            <div class="no-selection-placeholder" id="summary-placeholder">
+              <i class="fa-solid fa-gamepad retro-idle-icon"></i>
+              <p>Select a Pokemon from your boxes or party to inspect details and view stats.</p>
+            </div>
+            
+            <!-- Actual Summary Content -->
+            <div class="gba-summary-content hidden" id="summary-content">
+              <!-- GBA Screen Top Area -->
+              <div class="gba-screen-header">
+                <div class="gba-pokedex-no">No. <span id="summary-dex-no">001</span></div>
+                <div class="gba-pokemon-name" id="summary-name">Bulbasaur</div>
+                <div class="gba-pokemon-gender" id="summary-gender">♂</div>
+              </div>
+              
+              <!-- GBA Sprite and Type Info Row -->
+              <div class="gba-screen-hero">
+                <div class="gba-sprite-container">
+                  <div class="sprite-shine-effect hidden" id="summary-shine-sparkle"><i class="fa-solid fa-sparkles"></i></div>
+                  <img id="summary-sprite" src="" alt="Pokemon Sprite">
+                </div>
+                <div class="gba-attributes">
+                  <div class="gba-level-row">Lv. <span id="summary-level">50</span></div>
+                  <div class="gba-types" id="summary-types">
+                    <span class="type-badge grass">Grass</span>
+                  </div>
+                  <div class="gba-ball-container">
+                    <img id="summary-ball-img" src="" alt="Pokeball">
+                    <span id="summary-ball-name">Poké Ball</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- GBA PC Markings & Origin Stamps -->
+              <div class="gba-markings-origin-row">
+                <div class="gba-box-markings" id="summary-markings">
+                  <span class="mark circle" data-mark="circle">●</span>
+                  <span class="mark triangle" data-mark="triangle">▲</span>
+                  <span class="mark square" data-mark="square">■</span>
+                  <span class="mark heart" data-mark="heart">♥</span>
+                  <span class="mark star" data-mark="star">★</span>
+                  <span class="mark diamond" data-mark="diamond">◆</span>
+                </div>
+                <div class="gba-origin-logo" id="summary-origin-stamp">
+                  <!-- Game Boy / DS / 3DS stamps -->
+                </div>
+              </div>
+
+              <!-- GBA Screen Nav/Tabs for Detailed Specs -->
+              <div class="gba-screen-tabs">
+                <button class="gba-tab-btn active" data-gba-tab="info">INFO</button>
+                <button class="gba-tab-btn" data-gba-tab="stats">STATS</button>
+                <button class="gba-tab-btn" data-gba-tab="ribbons">RIBBONS</button>
+              </div>
+
+              <!-- Tab Contents -->
+              <div class="gba-tab-viewport">
+                <!-- Info Tab -->
+                <div class="gba-tab-content active" id="gba-tab-info">
+                  <div class="gba-data-grid">
+                    <div class="gba-data-item"><span>OT:</span> <strong id="summary-ot">Ash</strong></div>
+                    <div class="gba-data-item"><span>ID:</span> <strong id="summary-ot-id">12345</strong></div>
+                    <div class="gba-data-item"><span>Nature:</span> <strong id="summary-nature">Adamant</strong></div>
+                    <div class="gba-data-item"><span>Ability:</span> <strong id="summary-ability">Overgrow</strong></div>
+                    <div class="gba-data-item full-width"><span>Notes:</span> <span id="summary-notes">A nostalgic starter catch.</span></div>
+                  </div>
+                </div>
+                
+                <!-- Stats Tab -->
+                <div class="gba-tab-content" id="gba-tab-stats">
+                  <div class="gba-stats-bars">
+                    <div class="stat-bar-row">
+                      <span class="stat-label">HP:</span>
+                      <div class="stat-bar"><div class="stat-fill bg-hp" style="width: 50%" id="stat-fill-hp"></div></div>
+                      <span class="stat-val" id="stat-val-hp">100</span>
+                    </div>
+                    <div class="stat-bar-row">
+                      <span class="stat-label">Atk:</span>
+                      <div class="stat-bar"><div class="stat-fill bg-atk" style="width: 50%" id="stat-fill-atk"></div></div>
+                      <span class="stat-val" id="stat-val-atk">100</span>
+                    </div>
+                    <div class="stat-bar-row">
+                      <span class="stat-label">Def:</span>
+                      <div class="stat-bar"><div class="stat-fill bg-def" style="width: 50%" id="stat-fill-def"></div></div>
+                      <span class="stat-val" id="stat-val-def">100</span>
+                    </div>
+                    <div class="stat-bar-row">
+                      <span class="stat-label">SpA:</span>
+                      <div class="stat-bar"><div class="stat-fill bg-spa" style="width: 50%" id="stat-fill-spa"></div></div>
+                      <span class="stat-val" id="stat-val-spa">100</span>
+                    </div>
+                    <div class="stat-bar-row">
+                      <span class="stat-label">SpD:</span>
+                      <div class="stat-bar"><div class="stat-fill bg-spd" style="width: 50%" id="stat-fill-spd"></div></div>
+                      <span class="stat-val" id="stat-val-spd">100</span>
+                    </div>
+                    <div class="stat-bar-row">
+                      <span class="stat-label">Spe:</span>
+                      <div class="stat-bar"><div class="stat-fill bg-spe" style="width: 50%" id="stat-fill-spe"></div></div>
+                      <span class="stat-val" id="stat-val-spe">100</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Ribbons Tab -->
+                <div class="gba-tab-content" id="gba-tab-ribbons">
+                  <div class="gba-ribbons-showcase" id="summary-ribbons-grid">
+                    <!-- Ribbon badges will render here -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Footer Edit / Delete controls -->
+              <div class="gba-screen-actions">
+                <button class="btn-action-edit" id="btn-edit-current"><i class="fa-solid fa-pen"></i> Edit</button>
+                <button class="btn-action-delete" id="btn-delete-current"><i class="fa-solid fa-trash"></i> Release</button>
+              </div>
+            </div>
+
+          </div>
+          
+        </div>
+      </div>
+      
+    </main>
+    
+  </div>
+
+  <!-- Add/Edit Pokemon Modal -->
+  <div class="modal-overlay hidden" id="pokemon-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-title">Deposit Pokemon</h3>
+        <button class="modal-close-btn" id="btn-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="pokemon-form" class="modal-form">
+        <!-- Input parameters layout -->
+        <div class="form-grid">
+          
+          <!-- Species search & Autocomplete -->
+          <div class="form-group relative">
+            <label for="form-species">Species Name *</label>
+            <input type="text" id="form-species" required autocomplete="off" placeholder="e.g. Mudkip">
+            <div class="autocomplete-suggestions hidden" id="species-suggestions"></div>
+          </div>
+
+          <!-- Regional Form Selector -->
+          <div class="form-group">
+            <label for="form-variant">Regional Form / Variant</label>
+            <select id="form-variant">
+              <option value="normal">Default Form</option>
+              <option value="alola">Alola Form</option>
+              <option value="galar">Galar Form</option>
+              <option value="hisui">Hisui Form</option>
+              <option value="paldea">Paldea Form</option>
+              <option value="mega">Mega Evolution</option>
+            </select>
+          </div>
+
+          <!-- Nickname -->
+          <div class="form-group">
+            <label for="form-nickname">Nickname</label>
+            <input type="text" id="form-nickname" placeholder="Default name if blank">
+          </div>
+
+          <!-- Level -->
+          <div class="form-group">
+            <label for="form-level">Level (1-100)</label>
+            <input type="number" id="form-level" min="1" max="100" value="50">
+          </div>
+
+          <!-- Origin Game -->
+          <div class="form-group">
+            <label for="form-game">Origin Game *</label>
+            <select id="form-game" required>
+              <!-- Populated by JS groups -->
+            </select>
+          </div>
+
+          <!-- Pokéball Used -->
+          <div class="form-group">
+            <label for="form-ball">Poké Ball Used</label>
+            <select id="form-ball">
+              <option value="poke-ball">Poké Ball</option>
+              <option value="great-ball">Great Ball</option>
+              <option value="ultra-ball">Ultra Ball</option>
+              <option value="master-ball">Master Ball</option>
+              <option value="safari-ball">Safari Ball</option>
+              <option value="sport-ball">Sport Ball</option>
+              <option value="net-ball">Net Ball</option>
+              <option value="dive-ball">Dive Ball</option>
+              <option value="nest-ball">Nest Ball</option>
+              <option value="repeat-ball">Repeat Ball</option>
+              <option value="timer-ball">Timer Ball</option>
+              <option value="luxury-ball">Luxury Ball</option>
+              <option value="premier-ball">Premier Ball</option>
+              <option value="dusk-ball">Dusk Ball</option>
+              <option value="heal-ball">Heal Ball</option>
+              <option value="quick-ball">Quick Ball</option>
+              <option value="cherish-ball">Cherish Ball</option>
+            </select>
+          </div>
+
+          <!-- Shiny Checkbox -->
+          <div class="form-group checkbox-group flex-row">
+            <label for="form-shiny" class="flex-grow">Shiny Variant</label>
+            <label class="switch-toggle">
+              <input type="checkbox" id="form-shiny">
+              <span class="slider-toggle"></span>
+            </label>
+          </div>
+
+          <!-- Gender Selection -->
+          <div class="form-group">
+            <label for="form-gender">Gender</label>
+            <select id="form-gender">
+              <option value="♂">Male (♂)</option>
+              <option value="♀">Female (♀)</option>
+              <option value="⚲">Genderless (⚲)</option>
+            </select>
+          </div>
+
+          <!-- Nature -->
+          <div class="form-group">
+            <label for="form-nature">Nature</label>
+            <select id="form-nature">
+              <option value="Hardy">Hardy (Neutral)</option>
+              <option value="Lonely">Lonely (+Atk, -Def)</option>
+              <option value="Brave">Brave (+Atk, -Spe)</option>
+              <option value="Adamant">Adamant (+Atk, -SpA)</option>
+              <option value="Naughty">Naughty (+Atk, -SpD)</option>
+              <option value="Bold">Bold (+Def, -Atk)</option>
+              <option value="Docile">Docile (Neutral)</option>
+              <option value="Relaxed">Relaxed (+Def, -Spe)</option>
+              <option value="Impish">Impish (+Def, -SpA)</option>
+              <option value="Lax">Lax (+Def, -SpD)</option>
+              <option value="Timid">Timid (+Spe, -Atk)</option>
+              <option value="Hasty">Hasty (+Spe, -Def)</option>
+              <option value="Serious">Serious (Neutral)</option>
+              <option value="Jolly">Jolly (+Spe, -SpA)</option>
+              <option value="Naive">Naive (+Spe, -SpD)</option>
+              <option value="Modest">Modest (+SpA, -Atk)</option>
+              <option value="Mild">Mild (+SpA, -Def)</option>
+              <option value="Quiet">Quiet (+SpA, -Spe)</option>
+              <option value="Bashful">Bashful (Neutral)</option>
+              <option value="Rash">Rash (+SpA, -SpD)</option>
+              <option value="Calm">Calm (+SpD, -Atk)</option>
+              <option value="Gentle">Gentle (+SpD, -Def)</option>
+              <option value="Sassy">Sassy (+SpD, -Spe)</option>
+              <option value="Careful">Careful (+SpD, -SpA)</option>
+              <option value="Quirky">Quirky (Neutral)</option>
+            </select>
+          </div>
+
+          <!-- Ability -->
+          <div class="form-group">
+            <label for="form-ability">Ability</label>
+            <input type="text" id="form-ability" placeholder="e.g. Torrent">
+          </div>
+
+          <!-- Original Trainer Name (OT) -->
+          <div class="form-group">
+            <label for="form-ot">Original Trainer (OT)</label>
+            <input type="text" id="form-ot" placeholder="Trainer Name">
+          </div>
+
+          <!-- Trainer ID -->
+          <div class="form-group">
+            <label for="form-ot-id">Trainer ID No.</label>
+            <input type="text" id="form-ot-id" placeholder="e.g. 54291">
+          </div>
+
+          <!-- Box Selection -->
+          <div class="form-group">
+            <label for="form-box">PC Box Placement</label>
+            <select id="form-box">
+              <!-- Dynamically populated up to Box 20 -->
+            </select>
+          </div>
+
+          <!-- Notes -->
+          <div class="form-group full-width">
+            <label for="form-notes">Custom Notes / Location Caught</label>
+            <textarea id="form-notes" rows="2" placeholder="Route 119, during rain..."></textarea>
+          </div>
+
+          <!-- Ribbons selection -->
+          <div class="form-group full-width">
+            <label>Earned Ribbons</label>
+            <div class="ribbons-checklist-grid">
+              <label class="ribbon-check-label"><input type="checkbox" name="ribbons" value="hoenn-champion"> Hoenn Champion</label>
+              <label class="ribbon-check-label"><input type="checkbox" name="ribbons" value="sinnoh-champion"> Sinnoh Champion</label>
+              <label class="ribbon-check-label"><input type="checkbox" name="ribbons" value="unova-champion"> League Champion</label>
+              <label class="ribbon-check-label"><input type="checkbox" name="ribbons" value="alola-champion"> Alola Champion</label>
+              <label class="ribbon-check-label"><input type="checkbox" name="ribbons" value="effort"> Effort Ribbon</label>
+              <label class="ribbon-check-label"><input type="checkbox" name="ribbons" value="footprint"> Footprint Ribbon</label>
+              <label class="ribbon-check-label"><input type="checkbox" name="ribbons" value="artist"> Contest Artist</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live Preview area -->
+        <div class="modal-sprite-preview">
+          <div class="preview-sprite-card">
+            <span class="preview-tag">LIVE PREVIEW</span>
+            <img id="form-sprite-preview" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/0.png" alt="Select Species">
+          </div>
+          <div class="preview-instructions">
+            <p>Start typing a species name to see the preview. Unlocking the PWA allows offline sprite loads.</p>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" id="btn-modal-cancel">Cancel</button>
+          <button type="submit" class="btn-submit" id="btn-modal-submit">Deposit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Party Assignment Modal -->
+  <div class="modal-overlay hidden" id="party-modal">
+    <div class="modal-card mini-card">
+      <div class="modal-header">
+        <h3>Assign Party Favorite</h3>
+        <button class="modal-close-btn" id="btn-party-modal-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <p>Select which Pokemon from your deposited collection to assign to Party Slot <strong id="party-slot-indicator">1</strong>:</p>
+        <div class="party-assign-list" id="party-assign-list">
+          <!-- List of all deposited Pokemon with select button -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
