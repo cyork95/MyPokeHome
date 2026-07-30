@@ -255,44 +255,93 @@ class MyPokeHomeDB {
     this.dbName = 'MyPokeHomeDB';
     this.version = 1;
     this.db = null;
+    this.useFallback = false;
+    this.fallbackData = {
+      pokemon: {},
+      achievements: {},
+      settings: {},
+      species: {}
+    };
   }
 
   init() {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, this.version);
-      
-      request.onerror = (event) => reject('Database failed to open: ' + event.target.error);
-      
-      request.onsuccess = (event) => {
-        this.db = event.target.result;
-        resolve(this);
-      };
-      
-      request.onupgradeneeded = (event) => {
-        const db = event.target.result;
+    return new Promise((resolve) => {
+      try {
+        if (!window.indexedDB) {
+          throw new Error('IndexedDB not supported');
+        }
+        const request = indexedDB.open(this.dbName, this.version);
         
-        // Pokemon store
-        if (!db.objectStoreNames.contains('pokemon')) {
-          db.createObjectStore('pokemon', { keyPath: 'id', autoIncrement: true });
-        }
-        // Achievements store
-        if (!db.objectStoreNames.contains('achievements')) {
-          db.createObjectStore('achievements', { keyPath: 'id' });
-        }
-        // Settings store
-        if (!db.objectStoreNames.contains('settings')) {
-          db.createObjectStore('settings');
-        }
-        // Species list cache store
-        if (!db.objectStoreNames.contains('species')) {
-          db.createObjectStore('species', { keyPath: 'name' });
-        }
-      };
+        request.onerror = (event) => {
+          console.warn('Database failed to open: ' + event.target.error + '. Using LocalStorage fallback.');
+          this.setupFallback();
+          resolve(this);
+        };
+        
+        request.onsuccess = (event) => {
+          this.db = event.target.result;
+          resolve(this);
+        };
+        
+        request.onupgradeneeded = (event) => {
+          const db = event.target.result;
+          
+          // Pokemon store
+          if (!db.objectStoreNames.contains('pokemon')) {
+            db.createObjectStore('pokemon', { keyPath: 'id', autoIncrement: true });
+          }
+          // Achievements store
+          if (!db.objectStoreNames.contains('achievements')) {
+            db.createObjectStore('achievements', { keyPath: 'id' });
+          }
+          // Settings store
+          if (!db.objectStoreNames.contains('settings')) {
+            db.createObjectStore('settings');
+          }
+          // Species list cache store
+          if (!db.objectStoreNames.contains('species')) {
+            db.createObjectStore('species', { keyPath: 'name' });
+          }
+        };
+      } catch (err) {
+        console.warn('Database initialization blocked. Using LocalStorage fallback.', err);
+        this.setupFallback();
+        resolve(this);
+      }
     });
+  }
+
+  setupFallback() {
+    this.useFallback = true;
+    try {
+      const p = localStorage.getItem('mypokehome_fb_pokemon');
+      const a = localStorage.getItem('mypokehome_fb_achievements');
+      const s = localStorage.getItem('mypokehome_fb_settings');
+      const sp = localStorage.getItem('mypokehome_fb_species');
+
+      if (p) this.fallbackData.pokemon = JSON.parse(p);
+      if (a) this.fallbackData.achievements = JSON.parse(a);
+      if (s) this.fallbackData.settings = JSON.parse(s);
+      if (sp) this.fallbackData.species = JSON.parse(sp);
+    } catch (e) {
+      console.error('LocalStorage fallback also failed:', e);
+    }
+  }
+
+  saveFallback(storeName) {
+    if (!this.useFallback) return;
+    try {
+      localStorage.setItem(`mypokehome_fb_${storeName}`, JSON.stringify(this.fallbackData[storeName]));
+    } catch (e) {
+      console.error('Failed to write to LocalStorage:', e);
+    }
   }
 
   // General Store Operations
   getAll(storeName) {
+    if (this.useFallback) {
+      return Promise.resolve(Object.values(this.fallbackData[storeName]));
+    }
     return new Promise((resolve, reject) => {
       const tx = this.db.transaction(storeName, 'readonly');
       const store = tx.objectStore(storeName);
@@ -303,6 +352,9 @@ class MyPokeHomeDB {
   }
 
   get(storeName, key) {
+    if (this.useFallback) {
+      return Promise.resolve(this.fallbackData[storeName][key]);
+    }
     return new Promise((resolve, reject) => {
       const tx = this.db.transaction(storeName, 'readonly');
       const store = tx.objectStore(storeName);
@@ -313,6 +365,21 @@ class MyPokeHomeDB {
   }
 
   put(storeName, value, key) {
+    if (this.useFallback) {
+      let actualKey = key;
+      if (actualKey === undefined) {
+        if (value.id !== undefined) {
+          actualKey = value.id;
+        } else {
+          const keys = Object.keys(this.fallbackData[storeName]).map(Number).filter(n => !isNaN(n));
+          actualKey = keys.length > 0 ? Math.max(...keys) + 1 : 1;
+          value.id = actualKey;
+        }
+      }
+      this.fallbackData[storeName][actualKey] = value;
+      this.saveFallback(storeName);
+      return Promise.resolve(actualKey);
+    }
     return new Promise((resolve, reject) => {
       const tx = this.db.transaction(storeName, 'readwrite');
       const store = tx.objectStore(storeName);
@@ -323,6 +390,11 @@ class MyPokeHomeDB {
   }
 
   delete(storeName, key) {
+    if (this.useFallback) {
+      delete this.fallbackData[storeName][key];
+      this.saveFallback(storeName);
+      return Promise.resolve();
+    }
     return new Promise((resolve, reject) => {
       const tx = this.db.transaction(storeName, 'readwrite');
       const store = tx.objectStore(storeName);
@@ -333,6 +405,11 @@ class MyPokeHomeDB {
   }
 
   clear(storeName) {
+    if (this.useFallback) {
+      this.fallbackData[storeName] = {};
+      this.saveFallback(storeName);
+      return Promise.resolve();
+    }
     return new Promise((resolve, reject) => {
       const tx = this.db.transaction(storeName, 'readwrite');
       const store = tx.objectStore(storeName);
